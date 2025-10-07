@@ -1,4 +1,6 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import { User } from '@/app/lib/types/user';
+import { BaseResponse, PreRegisterRequest, PreRegisterResponse, RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, AuthRequest, AuthResponse, LogoutResponse } from '../lib/types/network';
 
 const ONE_MINUTE = 1000 * 60;
 
@@ -15,38 +17,51 @@ export default class Client {
     });
   }
 
-  async preRegister(email: string, passwordHash: string): Promise<string> {
+  async postEnhance(url: string, data?: any): Promise<BaseResponse> {
+    try {
+      const response: AxiosResponse = await this.api.post(url, data);
+      console.log('POST request response:', response.data);
+      return { ...response.data, timestamp: new Date() };
+    } catch (error) {
+      console.error('POST request error:', error);
+      const apiError = (error as AxiosError).response?.data;
+      throw apiError || error;
+    }
+  }
+
+  async preRegister(email: string, passwordHash: string): Promise<PreRegisterResponse> {
     const params: PreRegisterRequest = {
       email,
       passwordHash
     };
-    const res = await this.api.post('api/auth/preRegister', params);
-    return res.data.token;
+    const res = (await this.postEnhance('api/auth/preRegister', params)) as PreRegisterResponse;
+    return res;
   }
 
   async register(code: string) {
     const params: RegisterRequest = {
       code
     };
-    await this.api.post('api/auth/register', params);
+    const res = (await this.postEnhance('api/auth/register', params)) as RegisterResponse;
+    return res;
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<User> {
     const params: LoginRequest = {
       email,
       password
     };
-    const res = await this.api.post('api/auth/login', params);
-    return res.data;
+    const res = (await this.postEnhance('api/auth/login', params)) as LoginResponse;
+    return res.user as User;
   }
 
   async authorize() {
-    const res = await this.api.get('api/auth/authorize');
-    console.log('authorize response:', res.data);
-    return res.data;
+    const res = (await this.postEnhance('api/auth/authorize')) as AuthResponse;
+    return res;
   }
 
   async logout() {
-    await this.api.post('api/auth/logout');
+    const res = (await this.postEnhance('api/auth/logout')) as LogoutResponse;
+    return res;
   }
 }

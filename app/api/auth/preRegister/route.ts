@@ -5,21 +5,50 @@ import { randomUUID } from "crypto";
 import { Resend } from 'resend';
 import sql from "@/app/lib/data";
 import { cookies } from "next/headers";
+import { PreRegisterResponse } from "@/app/lib/types/network";
 
 const resend = new Resend(process.env.RESEND_API_KEY || '');
 
 export async function POST(req: Request) {
-  const { email, passwordHash } = await req.json();
-
-  if (!email || !passwordHash) {
-    return Response.json({ ok: false, error: "Parameter Error" }, { status: 400 });
-  }
+  const preRegisterResponse: PreRegisterResponse = { ok: true, code: 200 };
 
   try {
+    const { email, passwordHash } = await req.json();
+
+    if (!email || !passwordHash) {
+      preRegisterResponse.ok = false;
+      preRegisterResponse.code = 400;
+      preRegisterResponse.message = "Parameter Error";
+      return Response.json(preRegisterResponse, { status: 400 });
+    }
+    // 格式校验
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    if (!emailRegex.test(email)) {
+      preRegisterResponse.ok = false;
+      preRegisterResponse.code = 400;
+      preRegisterResponse.message = "Email format error";
+      return Response.json(preRegisterResponse, { status: 400 });
+    }
+    if (email.length > 100) {
+      preRegisterResponse.ok = false;
+      preRegisterResponse.code = 400;
+      preRegisterResponse.message = "Email too long";
+      return Response.json(preRegisterResponse, { status: 400 });
+    }
+    if (passwordHash.length < 32 || passwordHash.length > 128) {
+      preRegisterResponse.ok = false;
+      preRegisterResponse.code = 400;
+      preRegisterResponse.message = "Password hash length error";
+      return Response.json(preRegisterResponse, { status: 400 });
+    }
+
     // 1. Check if email already exists
     const existing = await sql`SELECT * FROM "User" WHERE email = ${email.toLowerCase()} LIMIT 1`;
     if (existing.length > 0) {
-      return Response.json({ ok: false, error: "Email already registered" }, { status: 400 });
+      preRegisterResponse.ok = false;
+      preRegisterResponse.code = 400;
+      preRegisterResponse.message = "Email already registered";
+      return Response.json(preRegisterResponse, { status: 400 });
     }
 
     // 2. generate temp token and store temp registration
@@ -52,8 +81,12 @@ export async function POST(req: Request) {
       secure: true
     })
     // 5. Return token
-    return Response.json({ ok: true, token });
+    return Response.json(preRegisterResponse);
   } catch (err) {
-    return Response.json({ ok: false, error: "Failed to initialize registration" }, { status: 500 });
+    console.error("Pre-register error:", err);
+    preRegisterResponse.ok = false;
+    preRegisterResponse.code = 500;
+    preRegisterResponse.message = "Internal Server Error";
+    return Response.json(preRegisterResponse, { status: 500 });
   }
 }
