@@ -1,3 +1,4 @@
+import { Word, WordStatus } from "./common";
 import { User } from "./user";
 
 export interface BaseResponse {
@@ -43,4 +44,18 @@ export interface LoginResponse extends BaseResponse {
 
 export interface AuthResponse extends BaseResponse {
   user?: User;
+}
+
+export interface QueryWordsRequest extends BaseRequest {
+  level: string;
+  status: WordStatus;
+  page?: number;
+  limit?: number;
+}
+
+export interface QueryWordsResponse extends BaseResponse {
+  words?: Array<Word>;
+  total?: number;
+  page?: number;
+  limit?: number;
 }

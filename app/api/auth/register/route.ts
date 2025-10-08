@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     // 1. 查找临时注册信息
     console.log('check temp register token');
     const tmp = await sql`
-      SELECT * FROM "TempRegister"
+      SELECT * FROM "temp_register"
       WHERE token = ${token} AND used = false AND expiresAt > now()
       LIMIT 1
     `;
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     // 2. 查找最新验证码
     console.log('check email code');
     const codeRecord = await sql`
-      SELECT * FROM "EmailCode"
+      SELECT * FROM "email_code"
       WHERE email = ${email} AND used = false AND expiresAt > now()
       ORDER BY createdAt DESC
       LIMIT 1
@@ -66,17 +66,17 @@ export async function POST(req: Request) {
 
     console.log("update email code table")
     // 3. 标记验证码已使用
-    await sql`UPDATE "EmailCode" SET used = true WHERE id = ${record.id}`;
+    await sql`UPDATE "email_code" SET used = true WHERE id = ${record.id}`;
 
     // 4. 创建正式用户
     console.log("create new user");
     await sql`
-      INSERT INTO "User" (email, passwordHash, emailVerified)
+      INSERT INTO "user" (email, passwordHash, emailVerified)
       VALUES (${email.toLowerCase()}, ${tempUser.passwordhash}, now())
     `;
 
     // 5. 标记临时 token 已使用
-    await sql`UPDATE "TempRegister" SET used = true WHERE token = ${token}`;
+    await sql`UPDATE "temp_register" SET used = true WHERE token = ${token}`;
 
     registerResponse.message = "Registration Successful";
     return Response.json(registerResponse);

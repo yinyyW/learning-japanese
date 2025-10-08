@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       loginResponse.message = "Email too long";
       return Response.json(loginResponse, { status: 400 });
     }
-    if (password.length < 32 || password.length > 128) {
+    if (password.length < 6 || password.length > 30) {
       loginResponse.ok = false;
       loginResponse.code = 400;
       loginResponse.message = "Password length error";
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     }
 
     console.log(`verifying user: ${email}`);
-    const rows = await sql<User[]>`SELECT * FROM "User" WHERE email=${email}`;
+    const rows = await sql<User[]>`SELECT * FROM "user" WHERE email=${email}`;
     const user = rows[0];
 
     if (!user) {

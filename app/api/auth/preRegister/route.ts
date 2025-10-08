@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     // 1. Check if email already exists
-    const existing = await sql`SELECT * FROM "User" WHERE email = ${email.toLowerCase()} LIMIT 1`;
+    const existing = await sql`SELECT * FROM "user" WHERE email = ${email.toLowerCase()} LIMIT 1`;
     if (existing.length > 0) {
       preRegisterResponse.ok = false;
       preRegisterResponse.code = 400;
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     await sql`
-      INSERT INTO "TempRegister" (token, email, passwordHash, expiresAt)
+      INSERT INTO "temp_register" (token, email, passwordHash, expiresAt)
       VALUES (${token}, ${email.toLowerCase()}, ${passwordHash}, ${expiresAt})
     `;
 
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     const codeHash = crypto.createHash("sha256").update(code).digest("hex");
     const codeExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
     await sql`
-      INSERT INTO "EmailCode" (email, codeHash, expiresAt)
+      INSERT INTO "email_code" (email, codeHash, expiresAt)
       VALUES (${email.toLowerCase()}, ${codeHash}, ${codeExpiresAt})
     `;
 
