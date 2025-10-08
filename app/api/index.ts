@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { User } from '@/app/lib/types/user';
-import { BaseResponse, PreRegisterRequest, PreRegisterResponse, RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, AuthRequest, AuthResponse, LogoutResponse } from '../lib/types/network';
+import { BaseResponse, PreRegisterRequest, PreRegisterResponse, RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, AuthResponse, LogoutResponse } from '../lib/types/network';
 
 const ONE_MINUTE = 1000 * 60;
 
@@ -17,7 +17,7 @@ export default class Client {
     });
   }
 
-  async postEnhance(url: string, data?: any): Promise<BaseResponse> {
+  async postEnhance(url: string, data?: object): Promise<BaseResponse> {
     try {
       const response: AxiosResponse = await this.api.post(url, data);
       console.log('POST request response:', response.data);

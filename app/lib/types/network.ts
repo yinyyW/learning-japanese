@@ -7,7 +7,9 @@ export interface BaseResponse {
   timestamp?: Date;
 }
 
-export interface BaseRequest {}
+export interface BaseRequest {
+  requestId?: string;
+}
 
 export interface PreRegisterRequest extends BaseRequest {
   email: string;
@@ -22,7 +24,13 @@ export interface RegisterRequest extends BaseRequest {
   code: string;
 }
 
-export interface RegisterResponse extends BaseResponse {}
+export type RegisterResponse = BaseResponse;
+
+export type AuthRequest = BaseRequest;
+
+export type LogoutRequest = BaseRequest;
+
+export type LogoutResponse = BaseResponse;
 
 export interface LoginRequest extends BaseRequest {
   email: string;
@@ -33,12 +41,6 @@ export interface LoginResponse extends BaseResponse {
   user?: User;
 };
 
-export interface AuthRequest extends BaseRequest {}
-
 export interface AuthResponse extends BaseResponse {
   user?: User;
 }
-
-export interface LogoutRequest extends BaseRequest {}
-
-export interface LogoutResponse extends BaseResponse {}
