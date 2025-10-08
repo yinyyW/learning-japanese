@@ -2,8 +2,7 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { AuthResponse } from "@/app/lib/types/network";
 import { User } from "@/app/lib/types/user";
-
-const JWT_SECRET = process.env.JWT_SECRET || '';
+import { JWT_SECRET } from "@/app/lib/constants";
 
 export async function POST(req: Request) {
   const authResponse: AuthResponse = { ok: true, code: 200 };
