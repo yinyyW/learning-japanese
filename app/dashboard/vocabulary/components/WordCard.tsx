@@ -1,5 +1,6 @@
 import React from 'react';
 import { SpeakerWaveIcon } from '@heroicons/react/20/solid';
+import { Word } from '@/app/lib/types/vocabulary';
 
 function WordCard(props: { word: Word }) {
   const { word } = props;

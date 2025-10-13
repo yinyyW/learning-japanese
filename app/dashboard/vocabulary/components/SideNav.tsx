@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import ProgressBar from '@/app/components/ProgressBar'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import { WordStatus } from '@/app/lib/types/common'
+import { WordStatus } from '@/app/lib/types/vocabulary'
 
 function SideNav() {
   const navItems = [

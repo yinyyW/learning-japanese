@@ -1,5 +1,6 @@
 import React from 'react'
-import WordCard from './WordCard'
+import WordCard from './WordCard';
+import { Word } from '@/app/lib/types/vocabulary';
 
 function WordList(props: { words: Word[] }) {
 
