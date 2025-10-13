@@ -8,8 +8,8 @@ type Word = {
   id: string;
   word: string;
   jlpt_level_id: string;
-  meaning: string;
-  furigana: string;
-  romaji: string;
-  level: number;
+  meaning?: string;
+  furigana?: string;
+  romaji?: string;
+  level?: number;
 }

@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { User } from '@/app/lib/types/user';
-import { BaseResponse, PreRegisterRequest, PreRegisterResponse, RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, AuthResponse, LogoutResponse } from '../lib/types/network';
+import { BaseResponse, PreRegisterRequest, PreRegisterResponse, RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, AuthResponse, LogoutResponse, QueryWordsRequest, QueryWordsResponse } from '../lib/types/network';
+import { Word, WordStatus } from '../lib/types/common';
 
 const ONE_MINUTE = 1000 * 60;
 
@@ -62,6 +63,17 @@ export default class Client {
 
   async logout() {
     const res = (await this.postEnhance('api/auth/logout')) as LogoutResponse;
+    return res;
+  }
+
+  async queryWords(level?: string, status?: WordStatus, page?: number, pageSize?: number): Promise<QueryWordsResponse> {
+    const params: QueryWordsRequest = {
+      level: level || 'N1',
+      status: status || WordStatus.not_learned,
+      page,
+      limit: pageSize
+    };
+    const res = (await this.postEnhance('api/vocabulary/queryWords', params)) as QueryWordsResponse;
     return res;
   }
 }

@@ -14,7 +14,7 @@ export enum WordStatus {
 }
 
 export type Word = {
-  id: number;
+  id: string;
   word: string;
   meaning: string;
   jlpt_level_id: UUID;

@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
     // 2️. Parse and validate request body
     console.log('parsing request body');
-    const { level, status, page = 1, limit = 20 } = await req.json();
+    const { level, status, page = 1, limit = 10 } = await req.json();
     const offset = (page - 1) * limit;
 
     if (!level || !status) {
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
     // 3️. Get jlpt_level_id from level name
     console.log('fetching jlpt level id');
-    const jlptRows = await sql<JLPTLevel[]>`SELECT id FROM "jlpt_levels" WHERE level_name = ${level} LIMIT 1`;
+    const jlptRows = await sql<JLPTLevel[]>`SELECT * FROM "jlpt_levels" WHERE level_name = ${level} LIMIT 1`;
     if (jlptRows.length === 0) {
       resData.code = 400;
       resData.ok = false;
@@ -55,6 +55,8 @@ export async function POST(req: Request) {
     }
     const jlptLevelId = jlptRows[0].id;
 
+    console.log(`jlpt: ${jlptRows[0].total_count}`);
+
     // 4️. Fetch words based on status
     console.log('fetching words');
     let wordsRows: postgres.Row[] = [];
@@ -62,10 +64,10 @@ export async function POST(req: Request) {
     const wordsLearned = await sql`SELECT count(*) AS total FROM words as w JOIN "user_word_learned" as uwl ON w.id = uwl.word_id WHERE uwl.user_id = ${user.id} AND w.jlpt_level_id = ${jlptLevelId}`;
 
     if (status === WordStatus.learned) {
-      wordsRows = await sql`SELECT w.* FROM words AS w JOIN "user_word_learned" AS uwl ON w.word_id = uwl.word_id
+      wordsRows = await sql`SELECT w.* FROM words AS w JOIN "user_word_learned" AS uwl ON w.id = uwl.word_id
       WHERE uwl.user_id = ${user.id} AND w.jlpt_level_id = ${jlptLevelId} ORDER BY w.romaji LIMIT ${limit} OFFSET ${offset};`;
     } else {
-      wordsRows = await sql`SELECT * FROM words AS w WHERE w.jlpt_level_id = ${jlptLevelId} AND NOT EXISTS (SELECT 1 FROM "user_word_learned" as uwl WHERE uwl.user_id = ${user.id} AND uwl.word_id = w.id) ORDER BY romaji LIMIT ${limit} OFFSET ${offset};`;
+      wordsRows = await sql`SELECT * FROM words AS w WHERE w.jlpt_level_id = ${jlptLevelId} AND NOT EXISTS (SELECT 1 FROM "user_word_learned" as uwl WHERE uwl.user_id = ${user.id} AND uwl.word_id = w.id) ORDER BY w.romaji LIMIT ${limit} OFFSET ${offset};`;
     }
     resData.words = [];
     wordsRows.forEach(row => {
@@ -79,6 +81,9 @@ export async function POST(req: Request) {
         level: row.level,
       });
     });
+
+
+    console.log(`wordsLearned: ${wordsLearned[0]?.total}, wordsTotal: ${wordsTotal}`);
     resData.total = status === WordStatus.learned ? (wordsLearned[0]?.total || 0) : (wordsTotal - (wordsLearned[0]?.total || 0));
     resData.page = page;
     resData.limit = limit;
