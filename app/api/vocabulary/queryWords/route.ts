@@ -2,7 +2,8 @@ import { QueryWordsResponse } from "@/app/lib/types/network";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import sql from "@/app/lib/data";
-import { JLPTLevel, WordStatus } from "@/app/lib/types/common";
+import { JLPTLevel } from "@/app/lib/types/common";
+import { WordStatus } from "@/app/lib/types/vocabulary";
 import postgres from "postgres";
 
 export async function POST(req: Request) {
