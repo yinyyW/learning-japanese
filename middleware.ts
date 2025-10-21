@@ -15,7 +15,7 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith(path)
   );
 
-  // 3️⃣ 没有 token 且访问受保护路由 → 重定向到登录页
+  // 3️  Verify token if accessing protected routes
   let validJwt = null;
   if (isProtected) {
     if (!token) {
@@ -33,7 +33,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 4️⃣ 允许请求继续
+  // 4️. Proceed to the requested route
   return NextResponse.next();
 }
 

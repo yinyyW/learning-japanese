@@ -1,5 +1,5 @@
-import React from 'react'
-import SideNav from '@/app/dashboard/vocabulary/components/SideNav';
+import React, { Suspense } from 'react'
+import SideNav from '@/app/dashboard/vocabulary/components/SideNav'
 
 function layout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,7 +7,9 @@ function layout({ children }: { children: React.ReactNode }) {
       <div className="flex-1">
         <SideNav />
       </div>
-      <div className="flex-3">{children}</div>
+      <Suspense fallback={<div className="flex-3">Loading...</div>}>
+        <div className="flex-3">{children}</div>
+      </Suspense>
     </div>
   )
 }
