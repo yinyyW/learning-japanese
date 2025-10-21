@@ -1,7 +1,11 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { User } from '@/app/lib/types/user';
-import { BaseResponse, PreRegisterRequest, PreRegisterResponse, RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, AuthResponse, LogoutResponse, QueryWordsRequest, QueryWordsResponse } from '../lib/types/network';
-import { Word, WordStatus } from '../lib/types/common';
+import {
+  BaseResponse, PreRegisterRequest, PreRegisterResponse, RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, AuthResponse, LogoutResponse, QueryWordsRequest, QueryWordsResponse,
+  QueryListeningListRequest, QueryListeningListResponse, QueryListeningDetailResponse, QueryListeningDetailRequest,
+  QueryListeningExamsResponse
+} from '../lib/types/network';
+import { WordStatus } from '../lib/types/vocabulary';
 
 const ONE_MINUTE = 1000 * 60;
 
@@ -74,6 +78,37 @@ export default class Client {
       limit: pageSize
     };
     const res = (await this.postEnhance('api/vocabulary/queryWords', params)) as QueryWordsResponse;
+    return res;
+  }
+
+  async queryListeningExams(level?: string): Promise<QueryListeningExamsResponse> {
+    const res = await this.postEnhance('api/listening/exams');
+    return res;
+  }
+
+  async queryListeningList(examId: number | string): Promise<QueryListeningListResponse> {
+    const params: QueryListeningListRequest = {
+      examId
+    };
+    const res = (await this.postEnhance('api/listening/list', params)) as QueryListeningListResponse;
+    return res;
+  }
+
+  async fetchListeningDetail(id: string | number): Promise<QueryListeningDetailResponse> {
+    const params: QueryListeningDetailRequest = {
+      materialId: id
+    };
+    const res = (await this.postEnhance('api/listening/detail', params)) as QueryListeningDetailResponse;
+    const data = res.data;
+
+    if (data) {
+      if (data.transcript) {
+        data.transcript_data = JSON.parse(data.transcript);
+      }
+      if (data.question) {
+        data.question_data = JSON.parse(data.question);
+      }
+    }
     return res;
   }
 }

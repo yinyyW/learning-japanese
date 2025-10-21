@@ -1,5 +1,6 @@
-import { Word, WordStatus } from "./common";
+import { WordStatus, Word } from "./vocabulary";
 import { User } from "./user";
+import { ListeningExam, ListeningMaterial } from "./listening";
 
 export interface BaseResponse {
   code: number;
@@ -32,7 +33,6 @@ export type AuthRequest = BaseRequest;
 export type LogoutRequest = BaseRequest;
 
 export type LogoutResponse = BaseResponse;
-
 export interface LoginRequest extends BaseRequest {
   email: string;
   password: string;
@@ -58,4 +58,28 @@ export interface QueryWordsResponse extends BaseResponse {
   total?: number;
   page?: number;
   limit?: number;
+}
+
+export interface QueryListeningExamsResponse extends BaseResponse {
+  data?: Array<ListeningExam>;
+  // total?: number;
+  // page?: number;
+  // pageSize?: number;
+}
+
+export interface QueryListeningListRequest extends BaseRequest {
+  examId: number | string;
+}
+
+export interface QueryListeningListResponse extends BaseResponse {
+  data?: Array<number | string>,
+  total?: number
+}
+
+export interface QueryListeningDetailRequest extends BaseRequest {
+  materialId: number | string;
+}
+
+export interface QueryListeningDetailResponse extends BaseResponse {
+  data?: ListeningMaterial
 }

@@ -40,7 +40,7 @@ export default function RootLayout({
       >
         <AppRouterCacheProvider>
           <AuthProvider>
-            <main className="bg-zinc-100">
+            <main className="bg-zinc-100 h-full min-h-screen">
               <NavigationBar />
               {children}
             </main>
